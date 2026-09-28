@@ -111,7 +111,7 @@ export default function Home() {
       </aside>
 
       <section className="main-column">
-        <header className="topbar"><div className="breadcrumb">Workspace <span>/</span> Ownership graph</div><div className="topbar-right"><span className={`status-dot${error ? " status-dot-error" : ""}`} /> {loading ? "Connecting to API" : error ? "API unavailable" : "API connected"} <span className="topbar-divider" /> <span className="help-mark">?</span></div></header>
+        <header className="topbar"><div className="breadcrumb">Workspace <span>/</span> Ownership graph</div><div className="topbar-right"><span className={`status-dot${loading ? " status-dot-loading" : error ? " status-dot-error" : ""}`} /> {loading ? "Connecting to API" : error ? "API unavailable" : "API connected"} <span className="topbar-divider" /> <span className="help-mark">?</span></div></header>
         <div className="content">
           <div className="page-heading"><div><div className="eyebrow">CORPORATE INTELLIGENCE</div><h1>Ownership graph</h1><p>Explore the companies and relationships in a corporate structure.</p></div><form className="company-search" onSubmit={submit}><label htmlFor="company-id">Company ID</label><div><input id="company-id" value={inputId} onChange={(event) => setInputId(event.target.value)} placeholder="Enter a company ID" /><button type="submit">Load graph <span>→</span></button></div></form></div>
 
@@ -119,7 +119,7 @@ export default function Home() {
             <div className="stat-card"><span className="stat-label">ENTITIES IN VIEW</span><strong>{graph?.nodes.length ?? "—"}</strong><span className="stat-note">Companies in this structure</span></div>
             <div className="stat-card"><span className="stat-label">OWNERSHIP LINKS</span><strong>{graph?.edges.length ?? "—"}</strong><span className="stat-note">Direct relationships</span></div>
             <div className="stat-card"><span className="stat-label">ROOT JURISDICTION</span><strong className="stat-country">{graph?.nodes.find((node) => node.id === graph.company_id)?.company.jurisdiction ?? "—"}</strong><span className="stat-note">Registered location</span></div>
-            <div className="stat-card"><span className="stat-label">GRAPH STATUS</span><strong className="stat-status"><span className="status-dot" />{loading ? "Loading" : error ? "Unavailable" : "Up to date"}</strong><span className="stat-note">Live data from ownership API</span></div>
+            <div className="stat-card"><span className="stat-label">GRAPH STATUS</span><strong className="stat-status"><span className={`status-dot${loading ? " status-dot-loading" : error ? " status-dot-error" : ""}`} />{loading ? "Loading" : error ? "Unavailable" : "Up to date"}</strong><span className="stat-note">Live data from ownership API</span></div>
           </div>
 
           <section className="graph-panel"><div className="panel-heading"><div><h2>Corporate structure</h2><p>Direct ownership relationships for <strong>{graph?.nodes.find((node) => node.id === graph.company_id)?.company.name ?? companyId}</strong></p></div><div className="legend"><span className="legend-line" /> Ownership <span className="legend-pill">Percentage</span></div></div>
@@ -127,9 +127,13 @@ export default function Home() {
               {loading && <div className="graph-message"><span className="spinner" />Loading ownership data…</div>}
               {!loading && error && <div className="graph-message error-message"><strong>Unable to load this graph</strong><span>{error}</span><button onClick={() => void loadGraph(companyId)}>Retry</button></div>}
               {!loading && !error && graph && graph.nodes.length === 0 && <div className="graph-message">No companies were found for this ID.</div>}
-              {!loading && !error && graph && graph.nodes.length > 0 && <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{ padding: 0.24 }} minZoom={0.35} maxZoom={1.5} proOptions={{ hideAttribution: true }}><Background color="#e9eef4" gap={24} size={1} /><Controls position="bottom-right" showInteractive={false} /></ReactFlow>}
+              {!loading && !error && graph && graph.nodes.length > 0 && <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{ padding: 0.24 }} minZoom={0.35} maxZoom={1.5} proOptions={{ hideAttribution: true }}><Background color="#e1e8ef" gap={24} size={1} /><Controls position="bottom-right" showInteractive={false} /></ReactFlow>}
             </div>
             <div className="panel-footer"><span><span className="footer-dot" /> Showing direct ownership only</span><span>{graph ? `Company ID: ${graph.company_id}` : "Ownership data"}</span></div>
+          </section>
+          <section className="insight-grid" aria-label="Ownership insights">
+            <article className="insight-card"><span className="insight-icon">i</span><div><h2>Why this matters</h2><p>Ownership links show how companies connect, helping you trace structure and understand relationships across the group.</p></div></article>
+            <article className="insight-card control-card"><span className="insight-icon">↳</span><div><h2>Who controls the rail</h2><p>{graph?.edges.length ? `Review the ${graph.edges.length} direct ownership ${graph.edges.length === 1 ? "link" : "links"} shown above. Percentages indicate recorded stakes; this view covers direct relationships only.` : "Load a company graph to review direct ownership links and recorded stakes across its structure."}</p></div></article>
           </section>
           <footer className="page-footer"><span>Corporate Ownership Graph</span><span>Structure data is provided by your connected API</span></footer>
         </div>
